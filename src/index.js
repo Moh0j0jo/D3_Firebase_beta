@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, query } from "firebase/firestore";
 
 // TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
@@ -107,43 +107,39 @@ const update = (data) => {
 
 //   update(data);
 
-//   d3.interval(()=> {
-//     data[0].orders +=50;
-    
-//     // update(data);
-//   }, 1000)
-
 // });
 
 
 let data = []
 
 const unsub = onSnapshot(colRef, (snapshot)  => {
- let test = []
- 
- 
- snapshot.forEach( doc => {
-  console.log('Document ID:', doc.id);
-  console.log('Document Data:', doc.data());
-   
-    // const doc = {...doc.data(), id: doc.id}
+
+
+ snapshot.docChanges().forEach( change => {
+  // console.log('Document ID:', doc.id);
+  // console.log('Document Data:', doc.data());
+  console.log(change)
+  console.log(change.doc.data())
     
-    // switch (change.type) {
-    //   case 'added':
-    //     data.push(doc);
-    //     break;
-    //   case 'modified':
-    //     const index = data.findIndex(item => { item.id == doc.id})
-    //     data[index] = doc;
-    //     break;
-    //   case 'removed':
-    //     data = data.filter(item => item.id !== doc.id);
-    //     break;
-    //   default:
-    //     break;
-    // }
+    const doc = {...change.doc.data(), id: change.doc.id};
+
+    
+    switch (change.type) {
+      case 'added':
+        data.push(doc);
+        break;
+      case 'modified':
+        const index = data.findIndex(item => { item.id == doc.id})
+        data[index] = doc;
+        break;
+      case 'removed':
+        data = data.filter(item => item.id !== doc.id);
+        break;
+      default:
+        break;
+    }
 
   })
  
-  // update(data)
+  update(data)
 })
